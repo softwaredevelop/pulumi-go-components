@@ -1,0 +1,5 @@
+name: components
+runtime: go
+description: Pulumi project for creating GitHub repository for pulumi-go-components project
+options:
+  refresh: always
