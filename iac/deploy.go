@@ -16,7 +16,7 @@ func main() {
 	// Configuration
 	stackProjectName := "components"
 	stackEnvironmentName := "pulumi-go-components"
-	workDir := "pulumi_gitlab_project"
+	workDir := "pulumi-github-main"
 	pulumiOrganizationName := os.Getenv("PULUMI_ORG_NAME")
 	pulumiAccessToken := os.Getenv("PULUMI_ACCESS_TOKEN")
 
