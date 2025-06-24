@@ -26,6 +26,9 @@ type StandardRepo struct {
 	RepositoryName   pulumi.StringOutput `pulumi:"repositoryName"`
 	RepositoryURL    pulumi.StringOutput `pulumi:"repositoryUrl"`
 	RepositoryNodeID pulumi.StringOutput `pulumi:"repositoryNodeId"`
+
+	// Expose the underlying repository resource to allow for composition.
+	Repository *github.Repository `pulumi:"repository"`
 }
 
 // NewStandardRepo is the constructor function for our component.
@@ -78,16 +81,6 @@ func NewStandardRepo(ctx *pulumi.Context, name string, args *StandardRepoArgs, o
 		return nil, err
 	}
 
-	_, err = github.NewIssueLabel(ctx, "label-go-modules", &github.IssueLabelArgs{
-		Repository:  repository.Name,
-		Name:        pulumi.String("go-modules dependencies"),
-		Color:       pulumi.String("9BE688"),
-		Description: pulumi.String("This issue is related to go modules dependencies"),
-	}, parentOpt) // Important: the component is the parent!
-	if err != nil {
-		return nil, err
-	}
-
 	// The Parent was already correctly set for the secrets, but now it too
 	// must point to the component, not directly to the repository.
 	_, err = github.NewActionsSecret(ctx, "secret-gitlab-repo", &github.ActionsSecretArgs{
@@ -118,12 +111,14 @@ func NewStandardRepo(ctx *pulumi.Context, name string, args *StandardRepoArgs, o
 	standardRepo.RepositoryName = repository.Name
 	standardRepo.RepositoryURL = repository.HtmlUrl
 	standardRepo.RepositoryNodeID = repository.NodeId
+	standardRepo.Repository = repository
 
 	// STEP 5: Register the outputs so the Pulumi engine can see them.
 	if err := ctx.RegisterResourceOutputs(standardRepo, pulumi.Map{
 		"repositoryName":   standardRepo.RepositoryName,
 		"repositoryUrl":    standardRepo.RepositoryURL,
 		"repositoryNodeId": standardRepo.RepositoryNodeID,
+		"repository":       standardRepo.Repository,
 	}); err != nil {
 		return nil, err
 	}

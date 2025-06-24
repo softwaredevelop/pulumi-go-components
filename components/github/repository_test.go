@@ -84,6 +84,7 @@ func TestNewStandardRepo(t *testing.T) {
 		assertOutputEquals(t, repo.RepositoryURL, "https://github.com/mock-owner/test-repo", "RepositoryURL should be the mocked URL")
 		// The child `repository` resource has the logical name "repository", so the mocked Node ID will contain it.
 		assertOutputEquals(t, repo.RepositoryNodeID, "mock-node-id-for-repository", "RepositoryNodeID should be the mocked Node ID")
+		assert.NotNil(t, repo.Repository, "The underlying Repository resource should be exposed")
 
 		return nil
 	}, pulumi.WithMocks("test-project", "test-stack", standardRepoMocks(0)))
