@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	gh "github.com/pulumi/pulumi-github/sdk/v6/go/github"
 	"github.com/pulumi/pulumi/sdk/v3/go/auto"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 
@@ -52,10 +53,23 @@ func TestStandardRepo_Integration(t *testing.T) {
 			return fmt.Errorf("failed to create StandardRepo component: %w", err)
 		}
 
+		// Test the composition model: add an extra resource using the component's outputs.
+		// This demonstrates how a user can extend the component's base configuration.
+		customLabel, err := gh.NewIssueLabel(pCtx, "custom-test-label", &gh.IssueLabelArgs{
+			Repository:  repo.Repository.Name, // Use the output from the component
+			Name:        pulumi.String("priority-high"),
+			Color:       pulumi.String("b60205"),
+			Description: pulumi.String("High priority issue"),
+		}, pulumi.Parent(repo)) // Set the component as the parent
+		if err != nil {
+			return fmt.Errorf("failed to create custom issue label: %w", err)
+		}
+
 		// Export the component's outputs so we can verify them.
 		pCtx.Export("repositoryName", repo.RepositoryName)
 		pCtx.Export("repositoryUrl", repo.RepositoryURL)
 		pCtx.Export("repositoryNodeId", repo.RepositoryNodeID)
+		pCtx.Export("customLabelName", customLabel.Name)
 
 		return nil
 	}
@@ -105,4 +119,8 @@ func TestStandardRepo_Integration(t *testing.T) {
 	nodeIDOutput, ok := upRes.Outputs["repositoryNodeId"]
 	assert.True(t, ok, "The 'repositoryNodeId' output must exist")
 	assert.NotEmpty(t, nodeIDOutput.Value, "The 'repositoryNodeId' should not be empty")
+
+	customLabelOutput, ok := upRes.Outputs["customLabelName"]
+	assert.True(t, ok, "The 'customLabelName' output must exist")
+	assert.Equal(t, "priority-high", customLabelOutput.Value, "The custom label should be created correctly")
 }
