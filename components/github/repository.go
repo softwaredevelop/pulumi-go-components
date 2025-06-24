@@ -1,3 +1,4 @@
+// Package github provides a Pulumi component for creating a standardized GitHub repository.
 package github
 
 import (
@@ -23,8 +24,8 @@ type StandardRepo struct {
 
 	// Output properties that we want to access after using the component.
 	RepositoryName   pulumi.StringOutput `pulumi:"repositoryName"`
-	RepositoryUrl    pulumi.StringOutput `pulumi:"repositoryUrl"`
-	RepositoryNodeId pulumi.StringOutput `pulumi:"repositoryNodeId"`
+	RepositoryURL    pulumi.StringOutput `pulumi:"repositoryUrl"`
+	RepositoryNodeID pulumi.StringOutput `pulumi:"repositoryNodeId"`
 }
 
 // NewStandardRepo is the constructor function for our component.
@@ -115,14 +116,14 @@ func NewStandardRepo(ctx *pulumi.Context, name string, args *StandardRepoArgs, o
 
 	// STEP 4: Set the output properties of the component.
 	standardRepo.RepositoryName = repository.Name
-	standardRepo.RepositoryUrl = repository.HtmlUrl
-	standardRepo.RepositoryNodeId = repository.NodeId
+	standardRepo.RepositoryURL = repository.HtmlUrl
+	standardRepo.RepositoryNodeID = repository.NodeId
 
 	// STEP 5: Register the outputs so the Pulumi engine can see them.
 	if err := ctx.RegisterResourceOutputs(standardRepo, pulumi.Map{
 		"repositoryName":   standardRepo.RepositoryName,
-		"repositoryUrl":    standardRepo.RepositoryUrl,
-		"repositoryNodeId": standardRepo.RepositoryNodeId,
+		"repositoryUrl":    standardRepo.RepositoryURL,
+		"repositoryNodeId": standardRepo.RepositoryNodeID,
 	}); err != nil {
 		return nil, err
 	}
