@@ -17,7 +17,7 @@ type StandardRepoArgs struct {
 }
 
 // StandardRepo is our custom component.
-// The output properties (e.g., URL) are defined here with `pulumi:"..."` tags.
+// The output properties (e.g., URL) are defined here with `pulumi:".."` tags.
 type StandardRepo struct {
 	pulumi.ResourceState
 
